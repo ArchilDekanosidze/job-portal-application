@@ -6,12 +6,11 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\JoblistingController;
 use App\Http\Controllers\PostJobController;
 use App\Http\Controllers\SubscriptionCOntroller;
+use App\Http\Controllers\TestController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckAuth;
-use App\Http\Middleware\isEmployer;
-use App\Http\Middleware\IsPremiumUser;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,15 +21,14 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/
+ */
 
+Route::get('/', [JoblistingController::class, 'index'])->name('listing.index');
+Route::get('/company/{id}', [JoblistingController::class, 'company'])->name('company');
 
-Route::get('/',[JoblistingController::class,'index'])->name('listing.index');
-Route::get('/company/{id}',[JoblistingController::class,'company'])->name('company');
+Route::get('/jobs/{listing:slug}', [JoblistingController::class, 'show'])->name('job.show');
 
-Route::get('/jobs/{listing:slug}',[JoblistingController::class,'show'])->name('job.show');
-
-Route::post('/resume/upload',[FileUploadController::class, 'store'])->middleware('auth');
+Route::post('/resume/upload', [FileUploadController::class, 'store'])->middleware('auth');
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
@@ -39,10 +37,10 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::get('/register/seeker', [UserController::class, 'createSeeker'])->name('create.seeker')
-->middleware(CheckAuth::class);
+    ->middleware(CheckAuth::class);
 Route::post('/register/seeker', [UserController::class, 'storeSeeker'])->name('store.seeker');
 Route::get('/register/employer', [UserController::class, 'createEmployer'])->name('create.employer')
-->middleware(CheckAuth::class);
+    ->middleware(CheckAuth::class);
 Route::post('/register/employer', [UserController::class, 'storeEmployer'])->name('store.employer');
 
 Route::get('/login', [UserController::class, 'login'])->name('login');
@@ -53,23 +51,22 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 Route::get('user/profile', [UserController::class, 'profile'])->name('user.profile')->middleware('auth');
 Route::post('user/profile', [UserController::class, 'update'])->name('user.update.profile')->middleware('auth');
 Route::get('user/profile/seeker', [UserController::class, 'seekerProfile'])->name('seeker.profile')
-->middleware(['auth','verified']);
+    ->middleware(['auth', 'verified']);
 
 Route::get('user/job/applied', [UserController::class, 'jobApplied'])->name('job.applied')
-->middleware(['auth','verified']);
+    ->middleware(['auth', 'verified']);
 
 Route::post('user/password', [UserController::class, 'changePassword'])->name('user.password')->middleware('auth');
 Route::post('upload/resume', [UserController::class, 'uploadResume'])->name('upload.resume')->middleware('auth');
 
-
-Route::get('register/resend-verification', [DashboardController::class,'resendVerification'])
-->name('register.resend-verification');
+Route::get('register/resend-verification', [DashboardController::class, 'resendVerification'])
+    ->name('register.resend-verification');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['verified'])
     ->name('dashboard');
 Route::get('/verify', [DashboardController::class, 'verify'])->name('verification.notice');
-Route::get('/resend/verification/email',[DashboardController::class, 'resend'])->name('resend.email');
+Route::get('/resend/verification/email', [DashboardController::class, 'resend'])->name('resend.email');
 
 Route::get('subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
 Route::get('pay/weekly', [SubscriptionController::class, 'initiatePayment'])->name('pay.weekly');
@@ -85,8 +82,11 @@ Route::put('job/{id}/edit', [PostJobController::class, 'update'])->name('job.upd
 Route::get('job', [PostJobController::class, 'index'])->name('job.index');
 Route::delete('job/{id}/delete', [PostJobController::class, 'destroy'])->name('job.delete');
 
-Route::get('applicants' ,[ApplicantController::class, 'index'])->name('applicants.index');
-Route::get('applicants/{listing:slug}' ,[ApplicantController::class, 'show'])->name('applicants.show');
+Route::get('applicants', [ApplicantController::class, 'index'])->name('applicants.index');
+Route::get('applicants/{listing:slug}', [ApplicantController::class, 'show'])->name('applicants.show');
 Route::post('shortlist/{listingId}/{userId}', [ApplicantController::class, 'shortlist'])
-->name('applicants.shortlist');
-Route::post('/applicantion/{listingId}/submit', [ApplicantController::class,'apply'])->name('applicantion.submit');
+    ->name('applicants.shortlist');
+Route::post('/applicantion/{listingId}/submit', [ApplicantController::class, 'apply'])->name('applicantion.submit');
+
+Route::get('/testEmail', [TestController::class, 'testEmail']);
+Route::get('/testSms', [TestController::class, 'testSms']);

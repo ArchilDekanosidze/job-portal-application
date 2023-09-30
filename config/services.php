@@ -12,7 +12,7 @@ return [
     | location for this type of information, allowing packages to have
     | a conventional file to locate the various service credentials.
     |
-    */
+     */
 
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
@@ -32,7 +32,18 @@ return [
     ],
 
     'stripe' => [
-        'secret' => env('STRIPE_SECRET_KEY')
+        'secret' => env('STRIPE_SECRET_KEY'),
     ],
-    
+    'sms' => [
+        'auth' => [
+            'uname' => env('SMS_uname'),
+            'pass' => env('SMS_pass'),
+            'from' => env('SMS_from'),
+        ],
+        'patterns' => [
+            'verification' => 'e9ssnpjkcqbtjlt',
+        ],
+        'baseUri' => env('SMS_uri'),
+    ],
+
 ];
