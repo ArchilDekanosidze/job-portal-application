@@ -34,16 +34,20 @@ return [
     'stripe' => [
         'secret' => env('STRIPE_SECRET_KEY'),
     ],
-    'sms' => [
+    'smsFaraz' => [
         'auth' => [
-            'uname' => env('SMS_uname'),
-            'pass' => env('SMS_pass'),
+            'uname' => env('SMS_Faraz_uname'),
+            'pass' => env('SMS_Faraz_pass'),
             'from' => env('SMS_from'),
         ],
-        'patterns' => [
-            'verification' => 'e9ssnpjkcqbtjlt',
-        ],
-        'baseUri' => env('SMS_uri'),
+        'baseUri' => "https://ippanel.com/patterns/pattern?username=",
     ],
 
+    'smsMeliPayamak' => [
+        'auth' => [
+            'uname' => env('SMS_MeliPayamak_uname'),
+            'pass' => env('SMS_MeliPayamak_pass'),
+        ],
+        'url' => "https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber",
+    ],
 ];

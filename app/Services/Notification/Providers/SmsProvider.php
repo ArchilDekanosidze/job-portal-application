@@ -4,46 +4,32 @@ namespace App\Services\Notification\Providers;
 use App\Models\User;
 use App\Services\Notification\Exceptions\UserDoesNotHaveNumber;
 use App\Services\Notification\Providers\Contracts\Provider;
-use GuzzleHttp\Client;
+use App\Services\Notification\Providers\SmsProviders\Contracts\SmsSender;
 
 class SmsProvider implements Provider
 {
     private $user;
-    private $text;
-    private $phone_number = 'phone_number';
-	
-    public function __construct(User $user, String $text)
+    private $data;
+    private $phone_number_column_name = 'phone';
+
+    public function __construct(User $user, array $data)
     {
         $this->user = $user;
-        $this->text = $text;
+        $this->data = $data;
     }
 
     public function send()
     {
         $this->havePhoneNumber();
-        $mobile = $this->user->{$this->phone_number};
-        $client = new Client();
-        $input_data = array("verification-code" => $this->text);
-        $url = $this->prepareUrlForSms($this->text, $mobile, $input_data);
-        $response = $client->post($url, $input_data);
-        return $response->getBody();
-    }
-
-    private function prepareUrlForSms(String $text, String $mobile, $input_data)
-    {
-        $username = config('services.sms.auth.uname');
-        $password = config('services.sms.auth.pass');
-        $from = config('services.sms.auth.from');
-        $pattern_code = config('services.sms.patterns.verification');
-        $to = array($mobile);
-        $baseUri = config('services.sms.baseUri');
-        $url = $baseUri . $username . "&password=" . urlencode($password) . "&from=$from&to=" . json_encode($to) . "&input_data=" . urlencode(json_encode($input_data)) . "&pattern_code=$pattern_code";
-        return $url;
+        $mobile = $this->user->{$this->phone_number_column_name};
+        $smsProvider = new SmsSender($mobile, $this->data);
+        $result = $smsProvider->send();
+        return $result;
     }
 
     private function havePhoneNumber()
     {
-        if (is_null($this->user->{$this->phone_number})) {
+        if (is_null($this->user->{$this->phone_number_column_name})) {
             throw new UserDoesNotHaveNumber();
         }
     }

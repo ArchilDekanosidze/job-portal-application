@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Jobs\Notification;
 
-use App\Models\User;
 use App\Services\Notification\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,20 +9,20 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class SendSms implements ShouldQueue
+class SendSmsToMultipleUser implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $user;
-    private $text;
+    private $multipleUser;
+    private $data;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(User $user, String $text)
+    public function __construct($multipleUser, array $data)
     {
-        $this->user = $user;
-        $this->text = $text;
+        $this->multipleUser = $multipleUser;
+        $this->data = $data;
     }
 
     /**
@@ -31,6 +30,6 @@ class SendSms implements ShouldQueue
      */
     public function handle(Notification $notification)
     {
-        return $notification->sendSms($this->user, $this->text);
+        return $notification->sendSmsToMultipleUser($this->multipleUser, $this->data);
     }
 }
